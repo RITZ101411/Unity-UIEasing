@@ -5,14 +5,25 @@ using UnityEngine;
 
 public class Sample : MonoBehaviour
 {
-    private UIEasing easing;
-    private UIEasing.EaseType  easeType;
-
+    [SerializeField] private GameObject targetGameObject;
+    
     void Start()
     {
-        easing = gameObject.AddComponent<UIEasing>();
-        easeType = UIEasing.EaseType.EaseInCubic;
-        easing.Play(new Vector2(0, 0), new Vector2(0, 10), 4f, easeType);
+        Vector2 startPos = new Vector2(0, 0);
+        Vector2 endPos = new Vector2(0, 100);
+        float time = 1.5f;
+        bool loop = false;
+
+        // イージング再生
+        UIEasing.PlayEase(
+            targetGameObject,
+            startPos,
+            endPos,
+            time,
+            UIEasing.EaseType.EaseInCubic,
+            loop
+        );
     }
 }
+
 ```
