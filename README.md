@@ -1,7 +1,8 @@
 # Sample.cs
 
-using UnityEngine;
 ```
+using UnityEngine;
+
 public class Sample : MonoBehaviour
 {
     private UIEasing easing;
