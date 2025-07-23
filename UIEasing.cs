@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class TextEasing : MonoBehaviour
+public class UIEasing : MonoBehaviour
 {
     public enum EaseType
     {
@@ -14,7 +14,7 @@ public class TextEasing : MonoBehaviour
         EaseInCirc, EaseOutCirc, EaseInOutCirc
     }
 
-    [SerializeField] private RectTransform rectTransform;
+    private RectTransform rectTransform;
 
     private Vector2 startPos;
     private Vector2 endPos;
@@ -25,10 +25,16 @@ public class TextEasing : MonoBehaviour
 
     [SerializeField] private bool loop = false;
 
-    void Start()
+    void Awake()
     {
+        Debug.Log(gameObject);
+        rectTransform = GetComponent<RectTransform>();
+        
         if (rectTransform == null)
-            rectTransform = GetComponent<RectTransform>();
+        {
+            Debug.LogError("[UIEasing] RectTransform が見つかりません。GameObject: " + gameObject.name);
+            enabled = false;
+        }
     }
 
     void Update()
@@ -56,14 +62,20 @@ public class TextEasing : MonoBehaviour
 
     public void Play(Vector2 start, Vector2 end, float time, EaseType ease)
     {
+        if (rectTransform == null)
+        {
+            Debug.LogError("[UIEasing] RectTransform が設定されていないため、Play を実行できません。GameObject: " + gameObject.name);
+            return;
+        }
+        
         this.startPos = start;
         this.endPos = end;
         this.duration = time;
         this.easeType = ease;
         this.timeElapsed = 0f;
         this.isPlaying = true;
-        if (rectTransform != null)
-            rectTransform.anchoredPosition = startPos;
+        
+        rectTransform.anchoredPosition = startPos;
     }
 
     float ApplyEasing(float t, EaseType type)
