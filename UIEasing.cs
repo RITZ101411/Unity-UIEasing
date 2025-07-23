@@ -1,78 +1,69 @@
 using UnityEngine;
 
-public class UIEasing : MonoBehaviour
+public class TextEasing : MonoBehaviour
 {
     public enum EaseType
     {
         Linear,
-        EaseInQuad,
-        EaseOutQuad,
-        EaseInOutQuad,
-        EaseInCubic,
-        EaseOutCubic,
-        EaseInOutCubic,
-        EaseInQuart,
-        EaseOutQuart,
-        EaseInOutQuart,
-        EaseInQuint,
-        EaseOutQuint,
-        EaseInOutQuint,
-        EaseInSine,
-        EaseOutSine,
-        EaseInOutSine,
-        EaseInExpo,
-        EaseOutExpo,
-        EaseInOutExpo,
-        EaseInCirc,
-        EaseOutCirc,
-        EaseInOutCirc
+        EaseInQuad, EaseOutQuad, EaseInOutQuad,
+        EaseInCubic, EaseOutCubic, EaseInOutCubic,
+        EaseInQuart, EaseOutQuart, EaseInOutQuart,
+        EaseInQuint, EaseOutQuint, EaseInOutQuint,
+        EaseInSine, EaseOutSine, EaseInOutSine,
+        EaseInExpo, EaseOutExpo, EaseInOutExpo,
+        EaseInCirc, EaseOutCirc, EaseInOutCirc
     }
 
     [SerializeField] private RectTransform rectTransform;
-    [SerializeField] private Vector2 startPos = new Vector2(0, -200);
-    [SerializeField] private Vector2 endPos = new Vector2(0, 0);
-    [SerializeField] private float duration = 2f;
-    [SerializeField] private float startDelay = 0f;
-    [SerializeField] private bool loop = false;
-    [SerializeField] private EaseType easeType = EaseType.EaseOutCubic;
 
-    private float timeElapsed = 0f;
-    private bool isDelaying = true;
+    private Vector2 startPos;
+    private Vector2 endPos;
+    private float duration;
+    private float timeElapsed;
+    private EaseType easeType;
+    private bool isPlaying = false;
+
+    [SerializeField] private bool loop = false;
 
     void Start()
     {
         if (rectTransform == null)
             rectTransform = GetComponent<RectTransform>();
-        rectTransform.anchoredPosition = startPos;
     }
 
     void Update()
     {
-        if (rectTransform == null) return;
-
-        if (isDelaying)
-        {
-            startDelay -= Time.deltaTime;
-            if (startDelay <= 0)
-            {
-                isDelaying = false;
-                startDelay = 0;
-            }
-            else return;
-        }
+        if (!isPlaying || rectTransform == null)
+            return;
 
         timeElapsed += Time.deltaTime;
         float t = Mathf.Clamp01(timeElapsed / duration);
         float easedT = ApplyEasing(t, easeType);
         rectTransform.anchoredPosition = Vector2.Lerp(startPos, endPos, easedT);
 
-        if (t >= 1f && loop)
+        if (t >= 1f)
         {
-            Vector2 temp = startPos;
-            startPos = endPos;
-            endPos = temp;
-            timeElapsed = 0f;
+            if (loop)
+            {
+                Play(endPos, startPos, duration, easeType);
+            }
+            else
+            {
+                isPlaying = false;
+            }
         }
+    }
+
+    public void Play(Vector2 start, Vector2 end, float time, EaseType ease)
+    {
+        this.startPos = start;
+        this.endPos = end;
+        this.duration = time;
+        this.easeType = ease;
+        this.timeElapsed = 0f;
+        this.isPlaying = true;
+        if (rectTransform != null)
+            rectTransform.anchoredPosition = startPos;
     }
 
     float ApplyEasing(float t, EaseType type)
