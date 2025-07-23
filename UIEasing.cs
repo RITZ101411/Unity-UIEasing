@@ -22,25 +22,21 @@ public class UIEasing : MonoBehaviour
     private float timeElapsed;
     private EaseType easeType;
     private bool isPlaying = false;
-
-    [SerializeField] private bool loop = false;
+    private bool loop = false;
 
     void Awake()
     {
-        Debug.Log(gameObject);
         rectTransform = GetComponent<RectTransform>();
-        
         if (rectTransform == null)
         {
-            Debug.LogError("[UIEasing] RectTransform が見つかりません。GameObject: " + gameObject.name);
+            Debug.LogError($"[UIEasing] RectTransform が見つかりません。GameObject: {gameObject.name}");
             enabled = false;
         }
     }
 
     void Update()
     {
-        if (!isPlaying || rectTransform == null)
-            return;
+        if (!isPlaying || rectTransform == null) return;
 
         timeElapsed += Time.deltaTime;
         float t = Mathf.Clamp01(timeElapsed / duration);
@@ -60,22 +56,34 @@ public class UIEasing : MonoBehaviour
         }
     }
 
-    public void Play(Vector2 start, Vector2 end, float time, EaseType ease)
+    public void Play(Vector2 start, Vector2 end, float time, EaseType ease, bool loop = false)
     {
         if (rectTransform == null)
         {
-            Debug.LogError("[UIEasing] RectTransform が設定されていないため、Play を実行できません。GameObject: " + gameObject.name);
+            Debug.LogError("[UIEasing] RectTransform が設定されていないため、Play を実行できません。");
             return;
         }
-        
+
         this.startPos = start;
         this.endPos = end;
         this.duration = time;
         this.easeType = ease;
         this.timeElapsed = 0f;
         this.isPlaying = true;
-        
+        this.loop = loop;
+
         rectTransform.anchoredPosition = startPos;
+    }
+
+    public static UIEasing PlayEase(GameObject obj, Vector2 start, Vector2 end, float time, EaseType ease, bool loop = false)
+    {
+        var easing = obj.GetComponent<UIEasing>();
+        if (easing == null)
+        {
+            easing = obj.AddComponent<UIEasing>();
+        }
+        easing.Play(start, end, time, ease, loop);
+        return easing;
     }
 
     float ApplyEasing(float t, EaseType type)
